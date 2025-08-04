@@ -42,6 +42,7 @@ public final class GitHubCopilotExtension: BuiltinExtension {
 
     public func workspaceDidClose(_: WorkspaceInfo) {}
 
+    // this calls Copilot notifyOpenTextDocument
     public func workspace(_ workspace: WorkspaceInfo, didOpenDocumentAt documentURL: URL) {
         guard isLanguageServerInUse else { return }
         // check if file size is larger than 15MB, if so, return immediately

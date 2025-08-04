@@ -9,6 +9,7 @@ public final class BuiltinExtensionWorkspacePlugin: WorkspacePlugin {
         super.init(workspace: workspace)
     }
 
+    // this calls Copilot notifyOpenTextDocument
     override public func didOpenFilespace(_ filespace: Filespace) {
         notifyOpenFile(filespace: filespace)
     }
@@ -32,6 +33,7 @@ public final class BuiltinExtensionWorkspacePlugin: WorkspacePlugin {
         }
     }
 
+    // this calls Copilot notifyOpenTextDocument
     public func notifyOpenFile(filespace: Filespace) {
         Task {
             guard filespace.isTextReadable else { return }

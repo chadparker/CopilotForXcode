@@ -140,9 +140,11 @@ public final class XcodeInspector: ObservableObject {
             latestNonRootWorkspaceURL = nil
         }
 
+        // finds running Xcode instances
         let runningApplications = NSWorkspace.shared.runningApplications
         xcodes = runningApplications
             .filter { $0.isXcode }
+            // creates a XcodeAppInstanceInspector for each Xcode instance
             .map(XcodeAppInstanceInspector.init(runningApplication:))
         let activeXcode = xcodes.first(where: \.isActive)
         latestActiveXcode = activeXcode ?? xcodes.first
@@ -160,6 +162,7 @@ public final class XcodeInspector: ObservableObject {
             }
 
             await withThrowingTaskGroup(of: Void.self) { [weak self] group in
+                // activation
                 group.addTask { [weak self] in // Did activate app
                     let sequence = NSWorkspace.shared.notificationCenter
                         .notifications(named: NSWorkspace.didActivateApplicationNotification)
@@ -193,6 +196,7 @@ public final class XcodeInspector: ObservableObject {
                     }
                 }
 
+                // termination
                 group.addTask { [weak self] in // Did terminate app
                     let sequence = NSWorkspace.shared.notificationCenter
                         .notifications(named: NSWorkspace.didTerminateApplicationNotification)
@@ -242,6 +246,7 @@ public final class XcodeInspector: ObservableObject {
                     }
                 }
 
+                // accessibility API issues
                 group.addTask { [weak self] in // malfunctioning
                     let sequence = NotificationCenter.default
                         .notifications(named: .accessibilityAPIMalfunctioning)
@@ -267,6 +272,10 @@ public final class XcodeInspector: ObservableObject {
         }
     }
 
+    // Get the focused UI element
+    // Determine if it's a source editor
+    // Monitor for focus changes
+
     @XcodeInspectorActor
     private func setActiveXcode(_ xcode: XcodeAppInstanceInspector) {
         previousActiveApplication = activeApplication
@@ -279,9 +288,12 @@ public final class XcodeInspector: ObservableObject {
 
         activeXcode = xcode
         latestActiveXcode = xcode
+        // active document
         activeDocumentURL = xcode.documentURL
+        // focused window
         focusedWindow = xcode.focusedWindow
         completionPanel = xcode.completionPanel
+        // project root
         activeProjectRootURL = xcode.projectRootURL
         activeWorkspaceURL = xcode.workspaceURL
         focusedWindow = xcode.focusedWindow
@@ -304,6 +316,7 @@ public final class XcodeInspector: ObservableObject {
             }
 
             focusedElement = getFocusedElementAndRecordStatus(xcode.appElement)
+            // focused editor
             if let editorElement = focusedElement, editorElement.isSourceEditor {
                 focusedEditor = .init(
                     runningApplication: xcode.runningApplication,

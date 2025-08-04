@@ -36,6 +36,7 @@ public protocol GitHubCopilotSuggestionServiceType {
     func notifyShown(_ completion: CodeSuggestion) async
     func notifyAccepted(_ completion: CodeSuggestion, acceptedLength: Int?) async
     func notifyRejected(_ completions: [CodeSuggestion]) async
+    // tells Copilot LSP that a file has been opened
     func notifyOpenTextDocument(fileURL: URL, content: String) async throws
     func notifyChangeTextDocument(fileURL: URL, content: String, version: Int) async throws
     func notifyCloseTextDocument(fileURL: URL) async throws
